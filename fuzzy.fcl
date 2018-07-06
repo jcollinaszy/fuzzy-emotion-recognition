@@ -1,0 +1,49 @@
+FUNCTION_BLOCK emotionRecognition
+ 
+    VAR_INPUT
+        smileLeft :     REAL;
+        smileRight :    REAL;
+        mouth :         REAL;
+    END_VAR
+ 
+    VAR_OUTPUT
+        Emotion : REAL;
+    END_VAR
+ 
+    FUZZIFY smileLeft
+        TERM Small := (0, 0) (0, 1) (55, 0) ;
+        TERM Big := (45, 0) (100, 1) (100, 0) ;
+    END_FUZZIFY
+ 
+    FUZZIFY smileRight
+        TERM Small := (0, 0) (0, 1) (55, 0) ;
+        TERM Big := (45, 0) (100, 1) (100, 0) ;
+    END_FUZZIFY
+
+    FUZZIFY mouth
+        TERM Small := (0, 0) (0, 1) (40, 0) ;
+        TERM Big := (40, 0) (100, 1) (100, 0) ;
+    END_FUZZIFY
+
+    DEFUZZIFY Emotion
+        TERM Happiness := 1;
+        TERM Neutral := 2;
+        TERM Surprise := 3;
+        TERM Anger := 4;
+		TERM Fear := 5;
+		TERM Disgust := 6;
+		TERM Sadness := 7;
+        ACCU:MAX;
+        METHOD: COGS;
+        DEFAULT := 0; 
+    END_DEFUZZIFY
+ 
+    RULEBLOCK first
+        AND:MIN;
+        RULE 0: IF (smileLeft IS Big) AND (smileRight IS Big) THEN (Emotion IS Neutral);
+        RULE 1: IF (smileLeft IS Small) AND (smileRight IS Small) THEN (Emotion IS Happiness);
+        RULE 2: IF (mouth IS Small) THEN (Emotion IS Surprise);
+
+    END_RULEBLOCK
+ 
+END_FUNCTION_BLOCK
